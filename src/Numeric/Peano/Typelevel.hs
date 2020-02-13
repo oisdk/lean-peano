@@ -68,11 +68,20 @@ type family (-) (n :: Nat) (m :: Nat) :: Nat where
     S n - S m = n - m
     Z   - S _ = Z
 
-type family Rem (n :: Nat) (m :: Nat) :: Nat where
-    Rem _ Z = TypeError (Text "divide by zero")
-    Rem n m = Rem' n m n m
+type family (%) (n :: Nat) (m :: Nat) :: Nat where
+    _ % Z = TypeError (Text "divide by zero")
+    n % m = Rem' n m n m
 
 type family Rem' (n :: Nat) (m :: Nat) (n' :: Nat) (m' :: Nat) :: Nat where
     Rem' n m n' Z = Rem' n' m n' m
     Rem' n m (S n') (S m') = Rem' n m n' m'
     Rem' n m Z (S _) = n
+
+type family (/) (n :: Nat) (m :: Nat) :: Nat where
+    _ / Z = TypeError (Text "divide by zero")
+    n / m = Div' m n m
+
+type family Div' (m :: Nat) (n' :: Nat) (m' :: Nat) :: Nat where
+    Div' m n' Z = S (Div' m n' m)
+    Div' m (S n') (S m') = Div' m n' m'
+    Div' m Z (S _) = Z
