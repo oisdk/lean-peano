@@ -17,4 +17,5 @@ cabal.sandbox.config
 *.eventlog
 .stack-work/
 cabal.project.local
-lean-peano.cabal
+dist-newstyle
+.DS_Store

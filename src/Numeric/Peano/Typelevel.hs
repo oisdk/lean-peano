@@ -21,11 +21,15 @@ type family (==) (n :: Nat) (m :: Nat) :: Bool where
 
 type family FromLit (n :: Lit.Nat) :: Nat where
     FromLit 0 = Z
-    FromLit n = S (FromLit (n Lit.- 1))
+    FromLit n = FromLit2 (Lit.Mod n 2) (FromLit (Lit.Div n 2))
+
+type family FromLit2 (odd :: Lit.Nat) (rest :: Nat) :: Nat where
+    FromLit2 0 n = n
+    FromLit2 1 n = S n
 
 type family ToLit (n :: Nat) :: Lit.Nat where
-    FromLit Z = 0
-    FromLit (S n) = 1 Lit.+ (ToLit n)
+    ToLit Z = 0
+    ToLit (S n) = 1 Lit.+ (ToLit n)
 
 type family Compare (n :: Nat) (m :: Nat) :: Ordering where
     Compare Z Z         = EQ
