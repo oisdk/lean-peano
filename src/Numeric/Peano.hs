@@ -25,7 +25,7 @@
 -- @
 --
 -- Using @'Data.List.genericLength'@, on the other hand, the laziness of
--- @'Peano'@ will indeed short-circuit:
+-- @'Nat'@ will indeed short-circuit:
 --
 -- >>> genericLength [1,2,3] == genericLength [1..]
 -- False
@@ -48,9 +48,9 @@ import           Text.Read
 -- $setup
 -- >>> import Test.QuickCheck
 -- >>> import Data.List (genericLength)
--- >>> default (Peano)
+-- >>> default (Nat)
 -- >>> :{
--- instance Arbitrary Peano where
+-- instance Arbitrary Nat where
 --     arbitrary = fmap (fromInteger . getNonNegative) arbitrary
 -- :}
 
@@ -68,11 +68,19 @@ data Nat
     | S Nat
     deriving (Eq,Generic,Data,Typeable)
 
-toChurch :: Nat -> (a -> a) -> a -> a
-toChurch p f k = go p where
-  go Z     = k
-  go (S n) = f (go n)
-{-# INLINE toChurch #-}
+foldrNat :: (a -> a) -> a -> Nat -> a
+foldrNat f k = go
+  where
+    go Z     = k
+    go (S n) = f (go n)
+{-# INLINE foldrNat #-}
+
+foldlNat :: (a -> a) -> a -> Nat -> a
+foldlNat f = go
+  where
+    go !b Z = b
+    go !b (S n) = go (f b) n
+{-# INLINE foldlNat #-}
 
 -- | As lazy as possible
 instance Ord Nat where
@@ -103,8 +111,8 @@ instance Ord Nat where
 --
 -- prop> n >= m ==> m - n == Z
 instance Num Nat where
-    (+) n = toChurch n S
-    n * m = toChurch n (m+) Z
+    n + m = foldrNat S m n
+    n * m = foldrNat (m+) Z n
     abs = id
     signum Z = Z
     signum (S _) = S Z
@@ -112,14 +120,14 @@ instance Num Nat where
         | n < 0 = error "cannot convert negative integers to Peano numbers"
         | otherwise = go n where
             go 0 = Z
-            go m = S $! go (m-1)
+            go m = S (go (m-1))
     n   - Z   = n
     S n - S m = n - m
     Z   - S _ = Z
 
 -- | The maximum bound here is infinity.
 --
--- prop> maxBound > (n :: Peano)
+-- prop> maxBound > (n :: Nat)
 instance Bounded Nat where
     minBound = Z
     maxBound = fix S
@@ -137,7 +145,6 @@ instance NFData Nat where
     rnf Z     = ()
     rnf (S n) = rnf n
 
--- | Reasonably expensive.
 instance Real Nat where
     toRational = toRational . toInteger
 
@@ -164,16 +171,13 @@ instance Enum Nat where
     succ = S
     pred (S n) = n
     pred Z = error "pred called on zero nat"
-    fromEnum = go 0
-      where
-        go !n Z = n
-        go !n (S m) = go (1 + n) m
+    fromEnum = foldlNat succ 0
     toEnum m
       | m < 0 = error "cannot convert negative number to Peano"
       | otherwise = go m
       where
         go 0 = Z
-        go n = S $! go (n - 1)
+        go n = S (go (n - 1))
     enumFrom = iterate S
     enumFromTo n m = unfoldr f (n, S m - n)
       where
@@ -201,10 +205,7 @@ instance Enum Nat where
 -- >>> 5 `div` 2
 -- 2
 instance Integral Nat where
-    toInteger = go 0
-      where
-        go !p Z     = p
-        go !p (S n) = go (p + 1) n
+    toInteger = foldlNat succ 0
     quotRem _ Z = (maxBound, error "divide by zero")
     quotRem x y = qr Z x y
       where

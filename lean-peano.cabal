@@ -1,4 +1,4 @@
-cabal-version: 1.12
+cabal-version: >= 1.12
 
 -- This file has been generated from package.yaml by hpack version 0.31.2.
 --
@@ -16,7 +16,7 @@ maintainer:     mail@doisinkidney.com
 copyright:      2020 Donnacha Oisín Kidney
 license:        MIT
 license-file:   LICENSE
-build-type:     Simple
+build-type:     Custom
 extra-source-files:
     README.md
     ChangeLog.md
@@ -25,12 +25,16 @@ source-repository head
   type: git
   location: https://github.com/oisdk/lean-peano
 
+custom-setup
+  setup-depends:
+      base
+    , Cabal
+    , cabal-doctest  >=1.0.6 && <1.1
+
 library
   exposed-modules:
       Numeric.Peano
       Numeric.Peano.Typelevel
-  other-modules:
-      Paths_lean_peano
   hs-source-dirs:
       src
   ghc-options: -Wall -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-redundant-constraints -Wcompat
@@ -39,16 +43,31 @@ library
     , deepseq
   default-language: Haskell2010
 
+test-suite doctests
+  type: exitcode-stdio-1.0
+  main-is: doctests.hs
+  hs-source-dirs:
+      doctest
+  ghc-options: -Wall -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-redundant-constraints -Wcompat -threaded
+  build-depends:
+      QuickCheck
+    , base
+    , base-compat
+    , deepseq
+    , doctest
+    , lean-peano
+    , template-haskell
+  default-language: Haskell2010
+
 test-suite lean-peano-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
-  other-modules:
-      Paths_lean_peano
   hs-source-dirs:
       test
   ghc-options: -Wall -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-redundant-constraints -Wcompat -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      base
     , deepseq
+    , hedgehog
     , lean-peano
   default-language: Haskell2010
