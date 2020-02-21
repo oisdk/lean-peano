@@ -68,6 +68,11 @@ data Nat
     | S Nat
     deriving (Eq,Generic,Data,Typeable)
 
+-- | A right fold over the naturals.
+-- Alternatively, a function which converts a natural into
+-- a Church natural.
+--
+-- prop> foldrNat S Z n === n
 foldrNat :: (a -> a) -> a -> Nat -> a
 foldrNat f k = go
   where
@@ -75,12 +80,13 @@ foldrNat f k = go
     go (S n) = f (go n)
 {-# INLINE foldrNat #-}
 
-foldlNat :: (a -> a) -> a -> Nat -> a
-foldlNat f = go
+-- | A strict left fold over the naturals.
+foldlNat' :: (a -> a) -> a -> Nat -> a
+foldlNat' f = go
   where
     go !b Z = b
     go !b (S n) = go (f b) n
-{-# INLINE foldlNat #-}
+{-# INLINE foldlNat' #-}
 
 -- | As lazy as possible
 instance Ord Nat where
@@ -171,7 +177,7 @@ instance Enum Nat where
     succ = S
     pred (S n) = n
     pred Z = error "pred called on zero nat"
-    fromEnum = foldlNat succ 0
+    fromEnum = foldlNat' succ 0
     toEnum m
       | m < 0 = error "cannot convert negative number to Peano"
       | otherwise = go m
@@ -205,7 +211,7 @@ instance Enum Nat where
 -- >>> 5 `div` 2
 -- 2
 instance Integral Nat where
-    toInteger = foldlNat succ 0
+    toInteger = foldlNat' succ 0
     quotRem _ Z = (maxBound, error "divide by zero")
     quotRem x y = qr Z x y
       where
