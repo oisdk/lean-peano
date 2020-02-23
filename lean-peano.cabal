@@ -7,7 +7,7 @@ cabal-version: >= 1.12
 -- hash: 64e91e616abbba7139ad4f000d8a6a1505b2a315175f0489493a319d6a76ac89
 
 name:           lean-peano
-version:        0.1.0.1
+version:        0.1.1.0
 description:    Please see the README on GitHub at <https://github.com/oisdk/lean-peano#readme>
 homepage:       https://github.com/oisdk/lean-peano#readme
 bug-reports:    https://github.com/oisdk/lean-peano/issues
