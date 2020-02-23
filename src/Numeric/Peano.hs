@@ -127,9 +127,9 @@ instance Num Nat where
         | otherwise = go n where
             go 0 = Z
             go m = S (go (m-1))
+    Z   - _   = Z
     n   - Z   = n
     S n - S m = n - m
-    Z   - S _ = Z
 
 -- | The maximum bound here is infinity.
 --

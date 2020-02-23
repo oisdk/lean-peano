@@ -94,9 +94,9 @@ type family (*) (n :: Nat) (m :: Nat) :: Nat where
 -- | Subtraction of type-level naturals.
 infixl 6 -
 type family (-) (n :: Nat) (m :: Nat) :: Nat where
+    Z   - _   = Z
     n   - Z   = n
     S n - S m = n - m
-    Z   - S _ = Z
 
 -- | Remainder on type-level naturals.
 type family (%) (n :: Nat) (m :: Nat) :: Nat where
