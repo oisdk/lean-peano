@@ -27,7 +27,7 @@ source-repository head
 
 custom-setup
   setup-depends:
-      base
+      base >=4.10.0.0 && <5
     , Cabal
     , cabal-doctest  >=1.0.6 && <1.1
 
@@ -39,8 +39,8 @@ library
       src
   ghc-options: -Wall -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-redundant-constraints -Wcompat
   build-depends:
-      base >=4.7 && <5
-    , deepseq
+      base >=4.10.0.0 && <5
+    , deepseq >= 1.1.0.0
   default-language: Haskell2010
 
 test-suite doctests
@@ -51,7 +51,7 @@ test-suite doctests
   ghc-options: -Wall -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-redundant-constraints -Wcompat -threaded
   build-depends:
       QuickCheck
-    , base
+    , base >=4.10.0.0 && <5
     , base-compat
     , deepseq
     , doctest
