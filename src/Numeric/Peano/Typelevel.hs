@@ -38,11 +38,7 @@ type family (==) (n :: Nat) (m :: Nat) :: Bool where
 -- | Conversion of numeric literals to naturals.
 type family FromLit (n :: Lit.Nat) :: Nat where
     FromLit 0 = Z
-    FromLit n = FromLit2 (Lit.Mod n 2) (FromLit (Lit.Div n 2))
-
-type family FromLit2 (odd :: Lit.Nat) (rest :: Nat) :: Nat where
-    FromLit2 0 n = n
-    FromLit2 1 n = S n
+    FromLit n = S (FromLit (n Lit.- 1))
 
 -- | Conversion of naturals to numeric literals.
 type family ToLit (n :: Nat) :: Lit.Nat where
