@@ -1,14 +1,15 @@
-cabal-version: >= 1.12
+cabal-version: 1.12
 
 name:           lean-peano
-version:        1.0.1.0
-synopsis:       A maximally lazy, simple implementation of the Peano numbers with minimal dependencies
+version:        1.0.2.0
+synopsis:       A maximally lazy, simple implementation of the Peano numbers with minimal dependencies.
 description:    Please see the README on GitHub at <https://github.com/oisdk/lean-peano#readme>
 homepage:       https://github.com/oisdk/lean-peano#readme
 bug-reports:    https://github.com/oisdk/lean-peano/issues
 author:         Donnacha Oisín Kidney
 maintainer:     mail@doisinkidney.com
 copyright:      2020 Donnacha Oisín Kidney
+category:       Numeric
 license:        MIT
 license-file:   LICENSE
 build-type:     Custom
