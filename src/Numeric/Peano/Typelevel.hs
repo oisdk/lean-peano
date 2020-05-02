@@ -54,13 +54,12 @@ type family Compare (n :: Nat) (m :: Nat) :: Ordering where
 
 -- | '<=' on type-level naturals.
 type family (<=) (n :: Nat) (m :: Nat) :: Bool where
-    Z   <= _   = True
-    S _ <= Z   = False
-    S n <= S m = n <= m
+    Z   <= _ = True
+    S n <= m = n < m
 
 -- | '<' on type-level naturals.
 type family (<) (n :: Nat) (m :: Nat) :: Bool where
-    _ < Z = False
+    _ < Z   = False
     n < S m = n <= m
 
 -- | The minimum of two type-level naturals.

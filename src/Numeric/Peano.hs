@@ -1,6 +1,6 @@
-{-# LANGUAGE BangPatterns         #-}
-{-# LANGUAGE DeriveDataTypeable   #-}
-{-# LANGUAGE DeriveGeneric        #-}
+{-# LANGUAGE BangPatterns       #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric      #-}
 
 -- | Peano numerals. Effort is made to make them as efficient as
 -- possible, and as lazy as possible, but they are many orders of
@@ -31,12 +31,12 @@
 -- False
 module Numeric.Peano where
 
-import           Data.List                   (unfoldr)
+import           Data.List       (unfoldr)
 
-import           Control.DeepSeq             (NFData (rnf))
+import           Control.DeepSeq (NFData (rnf))
 
-import           Data.Data                   (Data, Typeable)
-import           GHC.Generics                (Generic)
+import           Data.Data       (Data, Typeable)
+import           GHC.Generics    (Generic)
 
 import           Numeric.Natural
 
@@ -84,7 +84,7 @@ foldrNat f k = go
 foldlNat' :: (a -> a) -> a -> Nat -> a
 foldlNat' f = go
   where
-    go !b Z = b
+    go !b Z     = b
     go !b (S n) = go (f b) n
 {-# INLINE foldlNat' #-}
 
@@ -96,8 +96,7 @@ instance Ord Nat where
     compare (S _) Z     = GT
 
     Z   <= _   = True
-    S _ <= Z   = False
-    S n <= S m = n <= m
+    S n <= m   = n < m
 
     _ < Z = False
     n < S m = n <= m
@@ -105,12 +104,12 @@ instance Ord Nat where
     (>=) = flip (<=)
     (>) = flip (<)
 
-    min Z _ = Z
-    min _ Z = Z
+    min Z _         = Z
+    min _ Z         = Z
     min (S n) (S m) = S (min n m)
 
-    max Z m = m
-    max n Z = n
+    max Z m         = m
+    max n Z         = n
     max (S n) (S m) = S (max n m)
 
 -- | Subtraction stops at zero.
@@ -120,7 +119,7 @@ instance Num Nat where
     n + m = foldrNat S m n
     n * m = foldrNat (m+) Z n
     abs = id
-    signum Z = Z
+    signum Z     = Z
     signum (S _) = S Z
     fromInteger n
         | n < 0 = error "cannot convert negative integers to Peano numbers"
@@ -176,7 +175,7 @@ instance Real Nat where
 instance Enum Nat where
     succ = S
     pred (S n) = n
-    pred Z = error "pred called on zero nat"
+    pred Z     = error "pred called on zero nat"
     fromEnum = foldlNat' succ 0
     toEnum m
       | m < 0 = error "cannot convert negative number to Peano"
@@ -187,22 +186,22 @@ instance Enum Nat where
     enumFrom = iterate S
     enumFromTo n m = unfoldr f (n, S m - n)
       where
-        f (_,Z) = Nothing
+        f (_,Z)   = Nothing
         f (e,S l) = Just (e, (S e, l))
     enumFromThen n m = iterate t n
       where
-        ts Z mm = (+) mm
+        ts Z mm          = (+) mm
         ts (S nn) (S mm) = ts nn mm
-        ts nn Z = subtract nn
+        ts nn Z          = subtract nn
         t = ts n m
     enumFromThenTo n m t = unfoldr f (n, jm)
       where
         ts (S nn) (S mm) = ts nn mm
-        ts Z mm = (S t - n, (+) mm, mm)
-        ts nn Z = (S n - t, subtract nn, nn)
+        ts Z mm          = (S t - n, (+) mm, mm)
+        ts nn Z          = (S n - t, subtract nn, nn)
         (jm,tf,tt) = ts n m
         td = subtract tt
-        f (_,Z) = Nothing
+        f (_,Z)       = Nothing
         f (e,l@(S _)) = Just (e, (tf e, td l))
 
 
