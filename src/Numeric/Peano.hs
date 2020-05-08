@@ -42,6 +42,7 @@ import           Numeric.Natural
 
 import           Data.Ix
 
+import           Control.Arrow   (first)
 import           Data.Function
 import           Text.Read
 
@@ -95,8 +96,8 @@ instance Ord Nat where
     compare Z (S _)     = LT
     compare (S _) Z     = GT
 
-    Z   <= _   = True
-    S n <= m   = n < m
+    Z   <= _ = True
+    S n <= m = n < m
 
     _ < Z   = False
     n < S m = n <= m
@@ -110,7 +111,7 @@ instance Ord Nat where
 
     max Z     m = m
     max (S n) m = S (case m of
-      Z -> n
+      Z    -> n
       S pm -> max n pm)
 
 -- | Subtraction stops at zero.
@@ -212,13 +213,13 @@ instance Enum Nat where
 instance Integral Nat where
     toInteger = foldlNat' succ 0
     quotRem _ Z = (maxBound, error "divide by zero")
-    quotRem x y = qr Z x y
+    quotRem x y = qr x y
       where
-        qr q n m = go n m
+        qr n m = go n m
           where
-            go nn Z          = qr (S q) nn m
+            go nn Z          = first S (qr nn m)
             go (S nn) (S mm) = go nn mm
-            go Z (S _)       = (q, n)
+            go Z (S _)       = (Z, n)
     quot n m = go n where
       go = subt m where
         subt Z nn          = S (go nn)
