@@ -98,19 +98,20 @@ instance Ord Nat where
     Z   <= _   = True
     S n <= m   = n < m
 
-    _ < Z = False
+    _ < Z   = False
     n < S m = n <= m
 
     (>=) = flip (<=)
-    (>) = flip (<)
+    (>)  = flip (<)
 
     min Z _         = Z
     min _ Z         = Z
     min (S n) (S m) = S (min n m)
 
-    max Z m         = m
-    max n Z         = n
-    max (S n) (S m) = S (max n m)
+    max Z     m = m
+    max (S n) m = S (case m of
+      Z -> n
+      S pm -> max n pm)
 
 -- | Subtraction stops at zero.
 --
@@ -126,9 +127,8 @@ instance Num Nat where
         | otherwise = go n where
             go 0 = Z
             go m = S (go (m-1))
-    Z   - _   = Z
-    n   - Z   = n
     S n - S m = n - m
+    n   - _   = n
 
 -- | The maximum bound here is infinity.
 --
