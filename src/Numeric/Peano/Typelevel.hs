@@ -96,19 +96,19 @@ type family (-) (n :: Nat) (m :: Nat) :: Nat where
 -- | Remainder on type-level naturals.
 type family (%) (n :: Nat) (m :: Nat) :: Nat where
     _ % Z = TypeError (Text "divide by zero")
-    n % m = Rem' n m n m
+    n % (S m) = Rem' Z m n m
 
-type family Rem' (n :: Nat) (m :: Nat) (n' :: Nat) (m' :: Nat) :: Nat where
-    Rem' n m n' Z = Rem' n' m n' m
-    Rem' n m (S n') (S m') = Rem' n m n' m'
-    Rem' n m Z (S _) = n
+type family Rem' (k :: Nat) (m :: Nat) (n :: Nat) (j :: Nat) :: Nat where
+    Rem' k _ Z     _     = k
+    Rem' _ m (S n) Z     = Rem' Z m n m
+    Rem' k m (S n) (S j) = Rem' (S k) m n j
 
 -- | Division on type-level naturals.
 type family (/) (n :: Nat) (m :: Nat) :: Nat where
-    _ / Z = TypeError (Text "divide by zero")
-    n / m = Div' m n m
+    _ / Z     = TypeError (Text "divide by zero")
+    n / (S m) = Div' m n m
 
-type family Div' (m :: Nat) (n' :: Nat) (m' :: Nat) :: Nat where
-    Div' m n' Z = S (Div' m n' m)
-    Div' m (S n') (S m') = Div' m n' m'
-    Div' m Z (S _) = Z
+type family Div' (m :: Nat) (n :: Nat) (j :: Nat) :: Nat where
+    Div' _ Z _ = Z
+    Div' m (S n) Z = S (Div' m n m)
+    Div' m (S n) (S j) = Div' m n j

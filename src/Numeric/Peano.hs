@@ -42,7 +42,6 @@ import           Numeric.Natural
 
 import           Data.Ix
 
-import           Control.Arrow   (first)
 import           Data.Function
 import           Text.Read
 
@@ -213,24 +212,28 @@ instance Enum Nat where
 instance Integral Nat where
     toInteger = foldlNat' succ 0
     quotRem _ Z = (maxBound, error "divide by zero")
-    quotRem x y = qr x y
+    quotRem n' (S m) = go Z n' m
       where
-        qr n m = go n m
-          where
-            go nn Z          = first S (qr nn m)
-            go (S nn) (S mm) = go nn mm
-            go Z (S _)       = (Z, n)
-    quot n m = go n where
-      go = subt m where
-        subt Z nn          = S (go nn)
-        subt (S mm) (S nn) = subt mm nn
-        subt (S _) Z       = Z
+        go k Z     _     = (Z, k)
+        go _ (S n) Z     = fsuc (go Z n m)
+        go k (S n) (S j) = go (S k) n j
+
+        fsuc ~(x, y) = (S x, y)
+
+    quot _ Z = maxBound
+    quot n' (S m) = go n' m
+      where
+        go Z _         = Z
+        go (S n) Z     = S (go n m)
+        go (S n) (S j) = go n j
+
     rem _ Z = error "divide by zero"
-    rem nn mm = r nn mm where
-      r n m = go n m where
-        go nnn Z           = r nnn m
-        go (S nnn) (S mmm) = go nnn mmm
-        go Z (S _)         = n
+    rem n' (S m) = go Z n' m
+      where
+        go k Z _ = k
+        go _ (S n) Z = go Z n m
+        go k (S n) (S j) = go (S k) n j
+
     div = quot
     mod = rem
     divMod = quotRem
