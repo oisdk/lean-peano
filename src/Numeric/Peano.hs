@@ -1,6 +1,7 @@
 {-# LANGUAGE BangPatterns       #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric      #-}
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 
 -- | Peano numerals. Effort is made to make them as efficient as
 -- possible, and as lazy as possible, but they are many orders of
@@ -183,27 +184,49 @@ instance Enum Nat where
       where
         go 0 = Z
         go n = S (go (n - 1))
+        
     enumFrom = iterate S
+    
     enumFromTo n m = unfoldr f (n, S m - n)
       where
         f (_,Z)   = Nothing
         f (e,S l) = Just (e, (S e, l))
-    enumFromThen n m = iterate t n
-      where
-        ts Z mm          = (+) mm
-        ts (S nn) (S mm) = ts nn mm
-        ts nn Z          = subtract nn
-        t = ts n m
-    enumFromThenTo n m t = unfoldr f (n, jm)
-      where
-        ts (S nn) (S mm) = ts nn mm
-        ts Z mm          = (S t - n, (+) mm, mm)
-        ts nn Z          = (S n - t, subtract nn, nn)
-        (jm,tf,tt) = ts n m
-        td = subtract tt
-        f (_,Z)       = Nothing
-        f (e,l@(S _)) = Just (e, (tf e, td l))
 
+    enumFromThen n m = n : unfoldr (ts n m) n
+      where
+        ts Z m         = add m
+        ts n Z         = sub n
+        ts (S n) (S m) = ts n m
+
+        add m n = let r = m + n in Just (r, r)
+
+        sub Z     n     = Just (n,n)
+        sub (S _) Z     = Nothing
+        sub (S m) (S n) = sub m n
+
+    enumFromThenTo n m t = ts n m
+      where
+        n' = fromEnum n
+        t' = fromEnum t
+
+        ts (S nn) (S mm) = ts nn mm
+        ts Z mm          = unfoldr (up (fromEnum mm)) ((t' + 1) - n', n)
+        ts nn Z          = unfoldr (down (fromEnum nn)) ((n' + 1) - t', n)
+
+        up m (t, n)
+          | t <= 0 = Nothing
+          | otherwise = Just (n, (t - m, add m n))
+          
+        down m (t, n)
+          | t <= 0 = Nothing
+          | otherwise = Just (n, (t - m, sub m n))
+    
+        add 0 x = x
+        add n x = S (add (n-1) x)
+        
+        sub 0 x = x
+        sub n (S x) = sub (n-1) x
+        sub _ Z = Z
 
 -- | Errors on zero.
 --
